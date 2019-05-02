@@ -38,7 +38,7 @@ w = train_weights(train, 0.2, 20)
 
 # print(test.values)
 for row in test.values:
-	prediction = predict(row[:-1], w)
+	prediction = predict(row[:-2], w)
 	print("Expected=%d, Predicted=%d" % (row[-2], prediction))
 
 # x = predict([1, 5.3,3.7,1.5,0.2], w)
