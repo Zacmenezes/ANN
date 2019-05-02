@@ -3,30 +3,43 @@ import pandas as pd
 
 # Make a prediction with weights
 def predict(row, weights):
-    row = np.append([1], row[:2])
     activation = np.dot(row, weights)
     return 1 if activation >= 0.0 else 0
 
-# dataset = [[2.7810836,2.550537003,0],
-# 	[1.465489372,2.362125076,0],
-# 	[3.396561688,4.400293529,0],
-# 	[1.38807019,1.850220317,0],
-# 	[3.06407232,3.005305973,0],
-# 	[7.627531214,2.759262235,1],
-# 	[5.332441248,2.088626775,1],
-# 	[6.922596716,1.77106367,1],
-# 	[8.675418651,-0.242068655,1],
-# 	[7.673756466,3.508563011,1]]
-# weights = [-0.1, 0.20653640140000007, -0.23418117710000003]
+def train_weights(train, l_rate, n_epoch):
+    train_values = train.values
+    weights = np.ones(len(train.columns) - 2)
+    weights = np.append(-1, weights)
+    for epoch in range(n_epoch):
+        for row in train_values:
+            prediction = predict(row[:-1], weights)
+            error = row[-1] - prediction
+            weights = weights + l_rate * error * row[:-1]
+    return weights
 
-# for row in dataset:
-# 	prediction = predict(row, weights)
-# 	print("Expected=%d, Predicted=%d" % (row[-1], prediction))
+def create_x0(data):
+    return pd.DataFrame({'x0': np.ones(len(data.index))})
 
+# Preparing iris dataset
 iris_df = pd.read_csv("data/iris.data", header=None)
-iris_df.columns = ['x1', 'x2', 'x3', 'x4', 'label']
+iris_df.columns = ['x1', 'x2', 'x3', 'x4', 'd']
+iris_df['d'] = iris_df['d'].map({'Iris-setosa': 0,'Iris-versicolor': 1, 'Iris-virginica': 1})
+iris_df['label'] = iris_df['d'].map({0 : 'Setosa', 1 : 'Other'})
+x0 = create_x0(iris_df)
+iris_df = x0.join(iris_df)
 
-iris_df['label'] = iris_df['label'].map({'Iris-setosa': 'Setosa','Iris-versicolor': 'Other', 'Iris-virginica': 'Other'})
+# Split between train and test
+train=iris_df.sample(frac=0.8,random_state=250)
+test=iris_df.drop(train.index)
 
-print(iris_df.head())
-print(iris_df.tail())
+train = train.drop(columns=['label'])
+
+w = train_weights(train, 0.2, 20)
+
+# print(test.values)
+for row in test.values:
+	prediction = predict(row[:-1], w)
+	print("Expected=%d, Predicted=%d" % (row[-2], prediction))
+
+# x = predict([1, 5.3,3.7,1.5,0.2], w)
+# print(x)
