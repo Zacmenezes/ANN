@@ -9,6 +9,7 @@ def train_weights(train, l_rate, n_epoch):
     train_values = train.values
     weights = np.append(-1 , np.ones(len(train.columns) - 2))
     for epoch in range(n_epoch):
+        np.random.shuffle(train_values)
         for row in train_values:
             prediction = predict(row[:-1], weights)
             error = row[-1] - prediction
