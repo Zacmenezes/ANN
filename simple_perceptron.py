@@ -21,10 +21,15 @@ def create_x0(data):
 def prepare_dataset(path, index):
     df = pd.read_csv(path, header=None)
     df.columns = ['x1', 'x2', 'x3', 'x4', 'd']
+    # df.drop(['x3', 'x4'], axis=1)
     df['d'] = np.where(df['d']==index, 0, 1)
     x0 = create_x0(df)
     df = x0.join(df)
     return df
+
+def split(data, frac):
+    aux = data.sample(frac=frac)
+    return aux, data.drop(aux.index)
 
 def hit_rate(data, trained_weights):
     hit = 0
@@ -39,11 +44,9 @@ def hit_rate(data, trained_weights):
 def accuracy(data):
     results = []
     for i in range(20):
-        train=data.sample(frac=0.8)
-        test=data.drop(train.index)
-        w = train_weights(train, 0.45, 20)
+        train, test = split(data, 0.8)
+        w = train_weights(train, 0.1, 20)
         results.append(hit_rate(test.values, w))
-    # print(results)
     return np.average(results)
 
 setosa_df = prepare_dataset("data/iris.data", "Iris-setosa")
