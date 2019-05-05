@@ -1,60 +1,45 @@
 from abstract_problem import AbstractProblem
 import numpy as np
 import pandas as pd
-
-class Toy(AbstractProblem):
-
-    def __init__(self):
-        pass
-
-    def prepare_dataset(self, path):
-        
-        return df
-
-    def generate_data(self):
-       corners = [[0,0], [0,1], [1,0], [1,1]]
-       data = []
-       for corner in corners:
-           for i in range(10):
-                new = corner
-                print(new)
-                if(i < 5):
-                    new[0] = corner[0] + (np.random.random_sample(1)/5)[0]
-                else:
-                    new[1] = corner[1] + (np.random.random_sample(1)/5)[0]
-                data.append(new)
-       return data
-
 import random
 import matplotlib.pyplot as plt
 
-deviationFromPoint = 0.09
+class Toy(AbstractProblem):
+    
+    deviationFromPoint = 0.09
 
-def create_points(source):
-    points = []
-    for _ in range(10):
-        newCoords = [source[i] + random.random() * deviationFromPoint for i in range(2)]
-        points.append(newCoords)
-    return points
+    def __init__(self):
+        self.data = self.prepare_dataset("data/toy.data")
 
-p = np.array(create_points([0,0]))
-x = p[:,0]
-y = p[:,1]
-plt.scatter(x, y)
+    def prepare_dataset(self, path):
+        data = pd.read_csv(path, sep=",")
+        x0 = self.create_x0(data)
+        data = x0.join(data)
+        return data
 
-p = np.array(create_points([0,1]))
-x = p[:,0]
-y = p[:,1]
-plt.scatter(x, y)
+    def generate_data(self):
+        data = self.create_points([0,1], 0)
+        data = data.append(self.create_points([1,0], 0))
+        data = data.append(self.create_points([0,0], 0))
+        data = data.append(self.create_points([1,1], 1))
+        return data
 
-p = np.array(create_points([1,0]))
-x = p[:,0]
-y = p[:,1]
-plt.scatter(x, y)
+    def create_points(self, source, _class):
+        points = []
+        for _ in range(10):
+            coords = [source[i] + random.random() * self.deviationFromPoint for i in range(2)]
+            coords.append(_class)
+            points.append(coords)          
+        return pd.DataFrame(data=points, columns=['x1', 'x2', 'd'])
 
-p = np.array(create_points([1,1]))
-x = p[:,0]
-y = p[:,1]
-plt.scatter(x, y)
+    def plot_data(self):
+        c0 = self.data.loc[self.data['d'] == 0]
+        c1 = self.data.loc[self.data['d'] == 1]
 
-plt.show()
+        plt.scatter(c0['x1'], c0['x2'], c='red')
+        plt.scatter(c1['x1'], c1['x2'])
+
+        plt.show()
+
+# t = Toy()
+# t.plot_data()

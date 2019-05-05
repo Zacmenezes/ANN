@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from iris_problem import Iris
+from toy_problem import Toy
 
 class Perceptron:
 
@@ -45,17 +46,22 @@ class Perceptron:
             train, test = self.split(self.problem.data, 0.8)
             weights = self.train_weights(train, self.l_rate, self.n_epoch)
             hit_rates.append(self.hit_rate(test, weights))
+        print(hit_rates)
         return np.average(hit_rates), np.std(hit_rates)
 
 def main():
     
-    setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data'), 0.1, 20)
-    versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data'), 0.1, 20)
-    virginica = Perceptron(Iris('Iris-virginica', 'data/iris.data'), 0.1, 20)
+    # setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data'), 0.1, 20)
+    # versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data'), 0.1, 20)
+    # virginica = Perceptron(Iris('Iris-virginica', 'data/iris.data'), 0.1, 20)
 
-    print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
-    print("Accuracy=%f, Standard deviation=%f" % versicolor.evaluate())
-    print("Accuracy=%f, Standard deviation=%f" % virginica.evaluate())
+    toy = Toy()
+    toy.plot_data()
+    tp = Perceptron(toy, 0.05, 100)
+    print("Accuracy=%f, Standard deviation=%f" % tp.evaluate())
+    # print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
+    # print("Accuracy=%f, Standard deviation=%f" % versicolor.evaluate())
+    # print("Accuracy=%f, Standard deviation=%f" % virginica.evaluate())
     
 if __name__ == "__main__":
     main()
