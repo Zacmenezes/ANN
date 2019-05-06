@@ -9,12 +9,14 @@ import seaborn as sn
 
 class Perceptron:
 
+    index = 0
     def __init__(self, problem, l_rate, n_epoch):
         self.problem = problem
         self.l_rate = l_rate
         self.n_epoch = n_epoch
         self.cms = []
         self.weights = []
+        self.test = []
 
     def predict(self, row, weights):
         activation = np.dot(row, weights)
@@ -46,59 +48,65 @@ class Perceptron:
         for a, p in zip(actual, predicted):
             cm[a][p] += 1
         self.cms.append(cm)
+        self.weights.append(trained_weights)
+        self.test.append(data)
         return (actual == np.array(predicted)).sum() / float(len(actual)) * 100.0
 
     def evaluate(self):
         hit_rates = []
         while(len(hit_rates) < 20):
-            # train, test = self.split(self.problem.data, 0.8)
             train, test = train_test_split(self.problem.data, test_size=0.2, stratify=self.problem.data['d'])
             weights = self.train_weights(train, self.l_rate, self.n_epoch)
             hit_rates.append(self.hit_rate(test, weights))
-            self.weights = weights
         acc = np.average(hit_rates)
-        index = (np.abs(hit_rates-acc)).argmin()
-       
-        # self.print_confusion_matrixes(index)
-        self.plot_decision_surface(test)
+        index = (np.abs(hit_rates-acc)).argmin()      
+        # self.plot_confusion_matrixes(index)
+        # self.plot_decision_surface(index)
 
         return acc, np.std(hit_rates)
 
-    def plot_decision_surface(self, test):
-        for row in test.values:
-            p = self.predict(row[:-1], self.weights)
-            if(p == 1):
-                plt.scatter(row[1], row[2], c='red')
-            else:
-                plt.scatter(row[1], row[2], c='blue')
-        plt.show()
+    def plot_decision_surface(self, index):
+        test = self.test[index]
+        max_y = test[test['x1'] == test['x1'].max()]['x1'].values[0]
+        max_x = test[test['x2'] == test['x2'].max()]['x2'].values[0]
+        m = max(max_x, max_y)
+        
+        y = np.linspace(0, m, 100)
+        x = np.linspace(0, m, 100)
+        # for i in x:
+        #     for j in y:
+        #         p = self.predict([1, i, j], self.weights[index])
+        #         if(p == 1):
+        #             plt.scatter(i, j, c='#FF6666', marker='.')
+        #         else:
+        #             plt.scatter(i, j, c='#72bcd4', marker='.')
 
-    def print_confusion_matrixes(self, index):
-        # for i in range(len(hit_rates)):
-        #     if(hit_rates[i] <= acc and hit_rates[i] < 100.0):
-        #         cm = pd.DataFrame(self.cms[i])
-        #         print("A/P \n%s, iteration=%d" %(cm, i))
+        for row in test.values:
+            p = self.predict(row[:-1], self.weights[index])
+            if(p == 1):
+                plt.scatter(row[1], row[2], c='red', marker='v')
+            else:
+                plt.scatter(row[1], row[2], c='blue', marker='*')
+
+    def plot_confusion_matrixes(self, index):
         array = self.cms[index]        
         df_cm = pd.DataFrame(array, range(2), range(2))
         plt.figure(figsize = (2,2))
         sn.set(font_scale=1.4)
         sn.heatmap(df_cm, annot=True,annot_kws={"size": 16})
-        plt.show()
 
-def main():
-    
-    setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data'), 0.1, 20)
-    print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
-    
+def main():  
+    # setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data'), 0.01, 300)
+    # print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
     # versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data'), 0.1, 20)
     # print("Accuracy=%f, Standard deviation=%f" % versicolor.evaluate())
     
-    # virginica = Perceptron(Iris('Iris-virginica', 'data/iris.data'), 0.1, 20)
+    # virginica = Perceptron(Iris('Iris-virginica', 'data/iris.data'), 0.01, 300)
     # print("Accuracy=%f, Standard deviation=%f" % virginica.evaluate())
 
-    # tp = Perceptron(Toy(), 0.1, 20)
-    # Toy().plot_data()
-    # print("Accuracy=%f, Standard deviation=%f" % tp.evaluate())
+    tp = Perceptron(Toy(), 0.1, 100)
+    print("Accuracy=%f, Standard deviation=%f" % tp.evaluate())
+    plt.show()
   
     
 if __name__ == "__main__":
