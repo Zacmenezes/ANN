@@ -11,7 +11,7 @@ class Iris(AbstractProblem):
     def prepare_dataset(self, path):
         df = pd.read_csv(path, header=None)
         df.columns = ['x1', 'x2', 'x3', 'x4', 'd']
-        # df = df.drop(['x3', 'x4'], axis=1)
+        df = df.drop(['x1', 'x2'], axis=1)
         df['d'] = np.where(df['d']==self.label, 0, 1)
         x0 = self.create_x0(df)
         df = x0.join(df)

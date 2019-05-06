@@ -55,30 +55,32 @@ class Perceptron:
             weights = self.train_weights(train, self.l_rate, self.n_epoch)
             hit_rates.append(self.hit_rate(test, weights))
         acc = np.average(hit_rates)
-        # index = (np.abs(hit_rates-acc)).argmin()      
-        # self.plot_decision_surface(index)
-        # self.plot_confusion_matrixes(index)
+        index = (np.abs(hit_rates-acc)).argmin()      
+        self.plot_decision_surface(index)
+        self.plot_confusion_matrixes(index)
 
         return acc, np.std(hit_rates)
 
     def plot_decision_surface(self, index):
         test = self.test[index]
-        print(test['x1'].max(), test['x1'].min())
+        c = test.columns
+        x1_max, x1_min = test[c[1]].max() + 0.2, test[c[1]].min() - 0.2
+        x2_max, x2_min = test[c[2]].max() + 0.2, test[c[2]].min() - 0.2
 
         colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
         cmap = ListedColormap(colors[:50])
-        xx1, xx2 = np.meshgrid(np.arange(-0.5, 1.5, 0.02), np.arange(-0.5, 1.5, 0.02))
+        xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.02), np.arange(x2_min, x2_max, 0.02))
         Z =  np.array([xx1.ravel(), xx2.ravel()]).T
+        
         predicted = []
-
         for x1, x2 in Z:
             predicted.append(self.predict([1, x1, x2], self.weights[index]))
         aux = np.array(predicted)
+
         plt.contourf(xx1, xx2, aux.reshape(xx1.shape), alpha=0.4, cmap=cmap)
         
         for row in test.values:
-            p = self.predict(row[:-1], self.weights[index])
-            if(p == 1):
+            if(row[-1] == 0):
                 plt.scatter(row[1], row[2], c='red', marker='v')
             else:
                 plt.scatter(row[1], row[2], c='blue', marker='*')
@@ -91,8 +93,8 @@ class Perceptron:
         sn.heatmap(df_cm, annot=True,annot_kws={"size": 16})
 
 def main():  
-    # setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data'), 0.1, 100)
-    # print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
+    setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data'), 0.1, 100)
+    print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
     
     # versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data'), 0.01, 100)
     # print("Accuracy=%f, Standard deviation=%f" % versicolor.evaluate())
@@ -100,8 +102,8 @@ def main():
     # virginica = Perceptron(Iris('Iris-virginica', 'data/iris.data'), 0.01, 100)
     # print("Accuracy=%f, Standard deviation=%f" % virginica.evaluate())
 
-    tp = Perceptron(Toy(), 0.1, 100)
-    print("Accuracy=%f, Standard deviation=%f" % tp.evaluate())
+    # tp = Perceptron(Toy(), 0.1, 100)
+    # print("Accuracy=%f, Standard deviation=%f" % tp.evaluate())
     plt.show()
   
     
