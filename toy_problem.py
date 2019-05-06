@@ -13,15 +13,16 @@ class Toy(AbstractProblem):
 
     def prepare_dataset(self, path):
         data = pd.read_csv(path, sep=",")
+        data.columns = ['x1', 'x2', 'd']
         x0 = self.create_x0(data)
         data = x0.join(data)
         return data
 
     def generate_data(self):
         data = self.create_points([0,1], 0)
-        data = data.append(self.create_points([1,0], 0))
-        data = data.append(self.create_points([0,0], 0))
-        data = data.append(self.create_points([1,1], 1))
+        data = data.append(self.create_points([1,0], 0),  ignore_index=True)
+        data = data.append(self.create_points([0,0], 0),  ignore_index=True)
+        data = data.append(self.create_points([1,1], 1), ignore_index=True)
         return data
 
     def create_points(self, source, _class):
@@ -42,4 +43,5 @@ class Toy(AbstractProblem):
         plt.show()
 
 # t = Toy()
-# t.plot_data()
+# print(t.generate_data())
+# t.generate_data().to_csv('data/toy.data',index=False, header=False)
