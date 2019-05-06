@@ -4,6 +4,8 @@ from iris_problem import Iris
 from toy_problem import Toy
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import seaborn as sn
+
 
 class Perceptron:
 
@@ -55,36 +57,33 @@ class Perceptron:
             hit_rates.append(self.hit_rate(test, weights))
             self.weights = weights
         acc = np.average(hit_rates)
-        self.print_confusion_matrixes(hit_rates, acc)
-        # self.plot_decision_surface()
+        index = (np.abs(hit_rates-acc)).argmin()
+       
+        # self.print_confusion_matrixes(index)
+        self.plot_decision_surface(test)
+
         return acc, np.std(hit_rates)
 
-    def plot_decision_surface(self):
-        x = np.linspace(0,1.1,20)
-        y = np.linspace(0,1.1,20)
-        for i in x:
-            for j in y:
-                p = self.predict([1, i, j], self.weights)
-                if(p == 1):
-                    plt.scatter(i, j, c='red')
-                else:
-                    plt.scatter(i, j, c='blue')
+    def plot_decision_surface(self, test):
+        for row in test.values:
+            p = self.predict(row[:-1], self.weights)
+            if(p == 1):
+                plt.scatter(row[1], row[2], c='red')
+            else:
+                plt.scatter(row[1], row[2], c='blue')
         plt.show()
 
-    def print_confusion_matrixes(self, hit_rates, acc):
-        for i in range(len(hit_rates)):
-            if(hit_rates[i] <= acc and hit_rates[i] < 100.0):
-                cm = pd.DataFrame(self.cms[i])
-                print("A/P \n%s, iteration=%d" %(cm, i))
-
-    # def debug(self, hit_rates, cms):
-    #     print("")
-    #     for i in range(len(hit_rates)):
-    #         print("Accuracy=%f, iteration=%d" %(hit_rates[i], i))
-    #     print("")
-    #     for i in range(len(cms)):
-    #         print("%s, iteration=%d" %(cms[i], i))
-    #     print("")
+    def print_confusion_matrixes(self, index):
+        # for i in range(len(hit_rates)):
+        #     if(hit_rates[i] <= acc and hit_rates[i] < 100.0):
+        #         cm = pd.DataFrame(self.cms[i])
+        #         print("A/P \n%s, iteration=%d" %(cm, i))
+        array = self.cms[index]        
+        df_cm = pd.DataFrame(array, range(2), range(2))
+        plt.figure(figsize = (2,2))
+        sn.set(font_scale=1.4)
+        sn.heatmap(df_cm, annot=True,annot_kws={"size": 16})
+        plt.show()
 
 def main():
     
@@ -100,6 +99,7 @@ def main():
     # tp = Perceptron(Toy(), 0.1, 20)
     # Toy().plot_data()
     # print("Accuracy=%f, Standard deviation=%f" % tp.evaluate())
+  
     
 if __name__ == "__main__":
     main()
