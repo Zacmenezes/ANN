@@ -93,7 +93,7 @@ class Perceptron:
         sn.heatmap(df_cm, annot=True,annot_kws={"size": 16})
 
 def main():  
-    setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data'), 0.1, 100)
+    setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data', drop=['x1', 'x2']), 0.1, 100)
     print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
     
     # versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data'), 0.01, 100)
