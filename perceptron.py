@@ -7,7 +7,6 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sn
 
-
 class Perceptron:
 
     def __init__(self, problem, l_rate, n_epoch):
@@ -72,35 +71,39 @@ class Perceptron:
         xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.02), np.arange(x2_min, x2_max, 0.02))
         Z =  np.array([xx1.ravel(), xx2.ravel()]).T
         
+        fig, ax = plt.subplots()
         predicted = []
         for x1, x2 in Z:
             predicted.append(self.predict([1, x1, x2], self.weights[index]))
         aux = np.array(predicted)
 
-        plt.contourf(xx1, xx2, aux.reshape(xx1.shape), alpha=0.4, cmap=cmap)
+        ax.contourf(xx1, xx2, aux.reshape(xx1.shape), alpha=0.4, cmap=cmap)
         
         for row in test.values:
             if(row[-1] == 0):
-                plt.scatter(row[1], row[2], c='red', marker='v')
+                ax.scatter(row[1], row[2], c='red', marker='v')
             else:
-                plt.scatter(row[1], row[2], c='blue', marker='*')
+                ax.scatter(row[1], row[2], c='blue', marker='*')
+        ax.set_title(self.problem.label if hasattr(self.problem, 'label') else " - ")
 
     def plot_confusion_matrixes(self, index):
         array = self.cms[index]        
         df_cm = pd.DataFrame(array, range(2), range(2))
         plt.figure(figsize = (2,2))
         sn.set(font_scale=1.4)
-        sn.heatmap(df_cm, annot=True,annot_kws={"size": 16})
+        ax = plt.axes()
+        sn.heatmap(df_cm, annot=True,annot_kws={"size": 16}, ax=ax)
+        ax.set_title(self.problem.label if hasattr(self.problem, 'label') else " - ")
 
 def main():  
     setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data', drop=['x1', 'x2']), 0.1, 100)
     print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
     
-    # versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data'), 0.01, 100)
-    # print("Accuracy=%f, Standard deviation=%f" % versicolor.evaluate())
+    versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data', drop=['x1', 'x2']), 0.01, 100)
+    print("Accuracy=%f, Standard deviation=%f" % versicolor.evaluate())
     
-    # virginica = Perceptron(Iris('Iris-virginica', 'data/iris.data'), 0.01, 100)
-    # print("Accuracy=%f, Standard deviation=%f" % virginica.evaluate())
+    virginica = Perceptron(Iris('Iris-virginica', 'data/iris.data', drop=['x1', 'x2']), 0.01, 100)
+    print("Accuracy=%f, Standard deviation=%f" % virginica.evaluate())
 
     # tp = Perceptron(Toy(), 0.1, 100)
     # print("Accuracy=%f, Standard deviation=%f" % tp.evaluate())
