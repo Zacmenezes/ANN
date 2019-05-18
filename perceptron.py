@@ -66,19 +66,16 @@ class Perceptron:
         x1_max, x1_min = test[c[1]].max() + 0.2, test[c[1]].min() - 0.2
         x2_max, x2_min = test[c[2]].max() + 0.2, test[c[2]].min() - 0.2
 
-        colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
-        cmap = ListedColormap(colors[:50])
-        xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.02), np.arange(x2_min, x2_max, 0.02))
+        xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.1), np.arange(x2_min, x2_max, 0.1))
         Z =  np.array([xx1.ravel(), xx2.ravel()]).T
         
         fig, ax = plt.subplots()
-        predicted = []
         for x1, x2 in Z:
-            predicted.append(self.predict([1, x1, x2], self.weights[index]))
-        aux = np.array(predicted)
-
-        ax.contourf(xx1, xx2, aux.reshape(xx1.shape), alpha=0.4, cmap=cmap)
-        
+            if self.predict([1, x1, x2], self.weights[index]) == 0: 
+                ax.scatter(x1, x2, c='red', s=1.5, marker='o')
+            else:
+                ax.scatter(x1, x2, c='blue', s=1.5, marker='o')
+      
         for row in test.values:
             if(row[-1] == 0):
                 ax.scatter(row[1], row[2], c='red', marker='v')
@@ -99,11 +96,11 @@ def main():
     setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data', drop=['x1', 'x2']), 0.1, 100)
     print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
     
-    versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data', drop=['x1', 'x2']), 0.01, 100)
-    print("Accuracy=%f, Standard deviation=%f" % versicolor.evaluate())
+    # versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data', drop=['x1', 'x2']), 0.01, 100)
+    # print("Accuracy=%f, Standard deviation=%f" % versicolor.evaluate())
     
-    virginica = Perceptron(Iris('Iris-virginica', 'data/iris.data', drop=['x1', 'x2']), 0.01, 100)
-    print("Accuracy=%f, Standard deviation=%f" % virginica.evaluate())
+    # virginica = Perceptron(Iris('Iris-virginica', 'data/iris.data', drop=['x1', 'x2']), 0.01, 100)
+    # print("Accuracy=%f, Standard deviation=%f" % virginica.evaluate())
 
     # tp = Perceptron(Toy(), 0.1, 100)
     # print("Accuracy=%f, Standard deviation=%f" % tp.evaluate())
