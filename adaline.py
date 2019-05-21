@@ -36,10 +36,11 @@ class Adaline:
         self.plot(test, predictions)
 
     def plot(self, data, predictions):
-        for index, row in enumerate(data.values):
-            plt.scatter(row[1], row[2], c='blue', s=10)
-            plt.scatter(row[1], predictions[index], c='red', s=10)
-        plt.show()
+        if(self.problem.c == None):
+            for index, row in enumerate(data.values):
+                plt.scatter(row[1], row[2], c='blue', s=10)
+                plt.scatter(row[1], predictions[index], c='red', s=10)
+            plt.show()
             
 
 toy = Toy2(-4,1)
