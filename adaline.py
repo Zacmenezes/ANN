@@ -25,7 +25,6 @@ class Adaline:
             for row in train_values:
                 prediction = self.predict(row[:-1], weights)
                 error = row[-1] - prediction
-                print(weights)
                 weights = weights + l_rate * error * row[:-1]
             epoch += 1
         return weights
@@ -33,13 +32,16 @@ class Adaline:
     def realization(self):
         train, test = train_test_split(self.problem.data, test_size=0.2)
         weights = self.train_weights(train, self.l_rate, self.n_epoch)
-        predicted = []
-        for row in test.values:
-            p = self.predict(row[:-1], weights)
-            plt.scatter(row[1], row[2], c='blue')
-            plt.scatter(row[1], p, c='red')
-        plt.show()
+        predictions = [self.predict(row[:-1], weights) for row in test.values]
+        self.plot(test, predictions)
 
-toy = Toy2(5,-3)
-a = Adaline(toy, 0.001, 100)
+    def plot(self, data, predictions):
+        for index, row in enumerate(data.values):
+            plt.scatter(row[1], row[2], c='blue', s=10)
+            plt.scatter(row[1], predictions[index], c='red', s=10)
+        plt.show()
+            
+
+toy = Toy2(-4,1)
+a = Adaline(toy, 0.01, 200)
 a.realization()
