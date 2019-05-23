@@ -27,7 +27,7 @@ class Toy2(AbstractProblem):
 
     def create_3d(self, X):
         Y = np.random.rand(100, 1)
-        Z = [(self.a * x + self.b * y + self.c) + np.random.uniform(-0.1, 0.1) for x, y in zip(X, Y)]
+        Z = [(self.a * x + self.b * y + self.c) + np.random.uniform(-1, 1) for x, y in zip(X, Y)]
         df = pd.DataFrame(np.array([[Z[i][0], X[i], Y[i][0]] for i in range(len(Z))]))
         df.columns = ['x','y','z']
         df = self.normalize(df)

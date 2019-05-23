@@ -11,9 +11,7 @@ class Adaline:
         self.problem = problem
         self.l_rate = l_rate
         self.n_epoch = n_epoch
-        self.weights = []
-        self.test = []
-
+  
     def predict(self, row, weights):
         return np.dot(row, weights)
 
@@ -34,18 +32,24 @@ class Adaline:
         train, test = train_test_split(self.problem.data, test_size=0.2)
         weights = self.train_weights(train, self.l_rate, self.n_epoch)
         predictions = []
-        errors = []
+        errors = []    
         for row in test.values:
             prediction = self.predict(row[:-1], weights)
             predictions.append(prediction)
             error = row[-1] - prediction
             errors.append(error * error)
-        print("MSE=%f" % np.mean(errors))
-        self.plot(test, predictions)
+        print("MSE=%f RMSE=%f" % (np.mean(errors), np.sqrt(np.mean(errors))))
+        return np.mean(errors), np.sqrt(np.mean(errors)), test, predictions
 
     def evaluate(self, n):
+        results = []
         for _ in range(n):
-            self.realization()
+            results.append(self.realization())
+        ms_errors = [r[0] for r in results]
+        rms_errors = [r[1] for r in results]
+        index = (np.abs(ms_errors)).argmin() 
+        print("Melhor resultado: MSE=%f RMSE=%f" % (results[index][0], results[index][1]))     
+        self.plot(results[index][2], results[index][3])
 
     def plot(self, data, predictions):
         if(self.problem.c == None):
@@ -54,11 +58,10 @@ class Adaline:
         else:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
-            ax.plot_trisurf(data['x'].values, data['y'].values, predictions, linewidth=1, antialiased=True)
-            ax.scatter(data['x'].values, data['y'].values, data['z'].values, c='red', marker='o')
+            ax.plot_trisurf(data['x'].values, data['y'].values, predictions, linewidth=0.2)
+            ax.scatter(data['x'].values, data['y'].values, data['z'].values, c='red', marker='*')
         plt.show()
 
-toy = Toy2(-5, 20, 2)
-a = Adaline(toy, 0.01, 1000)
-a.realization()
-# a.evaluate(20)
+toy = Toy2(3, -4)
+a = Adaline(toy, 0.1, 1000)
+a.evaluate(5)
