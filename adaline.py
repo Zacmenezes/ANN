@@ -49,23 +49,16 @@ class Adaline:
 
     def plot(self, data, predictions):
         if(self.problem.c == None):
-            for index, row in enumerate(data.values):
-                plt.scatter(row[1], row[2], c='blue', s=10)
-                plt.scatter(row[1], predictions[index], c='red', s=10)
-            plt.show()
+            plt.scatter(data['x'].values, data['y'].values, c='blue', s=5)
+            plt.scatter(data['x'].values, predictions, c='red', s=10)
         else:
-            z_surface = []
-            for index, row in enumerate(data.values):
-                z_surface.append(predictions[index])
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
-            ax.plot_trisurf(data['x'].values, data['y'].values, z_surface, linewidth=1, antialiased=True)
+            ax.plot_trisurf(data['x'].values, data['y'].values, predictions, linewidth=1, antialiased=True)
             ax.scatter(data['x'].values, data['y'].values, data['z'].values, c='red', marker='o')
-            plt.show()
+        plt.show()
 
-            
-
-toy = Toy2(4, 8 ,-5)
+toy = Toy2(-5, 20, 2)
 a = Adaline(toy, 0.01, 1000)
 a.realization()
 # a.evaluate(20)

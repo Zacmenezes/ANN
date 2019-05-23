@@ -17,7 +17,7 @@ class Toy2(AbstractProblem):
         return self.create_2d(X)
         
     def create_2d(self, X):
-        Y = [(self.a * x + self.b) + np.random.uniform(-1,1) for x in X]
+        Y = [(self.a * x + self.b) + np.random.uniform(-2,2) for x in X]
         df = pd.DataFrame(np.array([[i,j] for i,j in zip(X,Y)]))
         df.columns = ['x','y']
         df = self.normalize(df)
