@@ -23,7 +23,7 @@ class Perceptron:
 
     def train_weights(self, train_df, l_rate, n_epoch):
         train_values = train_df.values
-        weights = np.random.randn(len(train_df.columns) - 1)
+        weights = np.random.randn(train_values.shape[1] - 1)
         epoch = 0
         while(epoch < n_epoch):
             np.random.shuffle(train_values)
@@ -93,7 +93,7 @@ class Perceptron:
         ax.set_title(self.problem.label if hasattr(self.problem, 'label') else " - ")
 
 def main():  
-    setosa = Perceptron(Iris('Iris-setosa', 'data/iris.data', drop=['x1', 'x2']), 0.1, 100)
+    setosa = Perceptron(Iris(label='Iris-setosa', drop=['x1', 'x2']), 0.1, 100)
     print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
     
     # versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data', drop=['x1', 'x2']), 0.01, 100)
