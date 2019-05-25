@@ -58,10 +58,13 @@ class Adaline:
         else:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
-            ax.plot_trisurf(data['x'].values, data['y'].values, predictions, linewidth=0.2)
+            ax.plot_trisurf(data['x'].values, data['y'].values, predictions, linewidth=0.2, antialiased=True)
             ax.scatter(data['x'].values, data['y'].values, data['z'].values, c='red', marker='*')
+            ax.set_xlabel('x', fontsize=20)
+            ax.set_ylabel('y', fontsize=20)
+            ax.set_zlabel('z', fontsize=20)
         plt.show()
 
-toy = Toy2(3, -4)
-a = Adaline(toy, 0.1, 1000)
+toy = Toy2(5, -3)
+a = Adaline(toy, 0.01, 500)
 a.evaluate(5)

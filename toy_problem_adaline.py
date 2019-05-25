@@ -11,12 +11,12 @@ class Toy2(AbstractProblem):
         self.data = self.prepare_dataset('')
 
     def prepare_dataset(self, path):
-        X = np.linspace(0,10,500)
         if(self.c != None):
-            return self.create_3d(X)
-        return self.create_2d(X)
+            return self.create_3d()
+        return self.create_2d()
         
-    def create_2d(self, X):
+    def create_2d(self):
+        X = np.linspace(0, 10, 500)
         Y = [(self.a * x + self.b) + np.random.uniform(-2,2) for x in X]
         df = pd.DataFrame(np.array([[i,j] for i,j in zip(X,Y)]))
         df.columns = ['x','y']
@@ -25,10 +25,11 @@ class Toy2(AbstractProblem):
         df = x0.join(df)
         return df
 
-    def create_3d(self, X):
-        Y = np.random.rand(100, 1)
-        Z = [(self.a * x + self.b * y + self.c) + np.random.uniform(-1, 1) for x, y in zip(X, Y)]
-        df = pd.DataFrame(np.array([[Z[i][0], X[i], Y[i][0]] for i in range(len(Z))]))
+    def create_3d(self):
+        X = np.random.rand(100)
+        Y = np.random.rand(100)
+        Z = [( (self.a * x) + (self.b * y) + self.c) + np.random.uniform(-1, 1) for x, y in zip(X, Y)]
+        df = pd.DataFrame(np.array([[X[i], Y[i], Z[i]] for i in range(len(Z))]))
         df.columns = ['x','y','z']
         df = self.normalize(df)
         x0 = self.create_x0(df)
