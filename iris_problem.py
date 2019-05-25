@@ -26,22 +26,3 @@ class Iris(AbstractProblem):
         else:
             df['d'] = np.where(df['d'] == self.label, 0, 1)
         return df
-
-# iris = Iris()
-# data = iris.data.drop(['d0','d1','d2'], axis=1)[90:100].values
-# target = iris.data[['d0','d1','d2']][90:100].values
-
-# x = np.array([data[0], data[0], data[0]])
-# w = np.ones((5,3))
-# etha = 0.1
-# predictions = np.dot(data[0], w)
-
-# degrau = np.vectorize(lambda x: 1 if x >= 0 else 0)
-# predictions = degrau(predictions)
-
-# print(predictions)
-# errors = target[0] - predictions[0]
-# print(errors)
-
-# w = w + etha * np.outer(data[0], errors.T)
-# print(w)

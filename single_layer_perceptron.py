@@ -14,14 +14,14 @@ class SingleLayerPerceptron():
     def train_weights(self, train_df, learn_rate, max_epochs):
         train_data = train_df.drop(['d0','d1','d2'], axis=1).values
         target = train_df[['d0','d1','d2']].values
-        weights = np.random.randn(5,3)
+        weights = np.random.randn(3,5)
         epoch = 0
         while(epoch < max_epochs):
-            np.random.shuffle(train_data)
-            for row, row_target in zip(train_data, target):   
-                predictions = self.validate(np.dot(row, weights))
+            # np.random.shuffle(train_data)
+            for row, row_target in zip(train_data, target):  
+                predictions = self.validate(np.dot(row, weights.T))
                 error = row_target - predictions
-                weights = weights + learn_rate * np.outer(row, error.T)
+                weights = weights + learn_rate * np.outer(row, error).T
             epoch += 1
         return weights
 
@@ -30,7 +30,7 @@ class SingleLayerPerceptron():
         test = data.drop(['d0','d1','d2'], axis=1).values
         hit = 0
         for row, row_target in zip(test, actual):
-            p = np.dot(row, trained_weights)
+            p = np.dot(row, trained_weights.T)
             p = self.validate(p)
             if((p == row_target).all()):
                 hit += 1
@@ -50,5 +50,5 @@ class SingleLayerPerceptron():
 
 
 iris = Iris()
-slp  = SingleLayerPerceptron(problem=iris, learn_rate=0.5, max_epochs=200)
+slp  = SingleLayerPerceptron(problem=iris, learn_rate=0.01, max_epochs=500)
 slp.test()
