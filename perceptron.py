@@ -93,19 +93,18 @@ class Perceptron:
         ax.set_title(self.problem.label if hasattr(self.problem, 'label') else " - ")
 
 def main():  
-    setosa = Perceptron(Iris(label='Iris-setosa', drop=['x1', 'x2']), 0.1, 100)
-    print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
+    # setosa = Perceptron(Iris(label='Iris-setosa', drop=['x1', 'x2']), 0.1, 100)
+    # print("Accuracy=%f, Standard deviation=%f" % setosa.evaluate())
     
-    # versicolor = Perceptron(Iris('Iris-versicolor', 'data/iris.data', drop=['x1', 'x2']), 0.01, 100)
+    # versicolor = Perceptron(Iris(label='Iris-versicolor', drop=['x1', 'x2']), 0.01, 100)
     # print("Accuracy=%f, Standard deviation=%f" % versicolor.evaluate())
     
-    # virginica = Perceptron(Iris('Iris-virginica', 'data/iris.data', drop=['x1', 'x2']), 0.01, 100)
+    # virginica = Perceptron(Iris(label='Iris-virginica', drop=['x1', 'x2']), 0.01, 100)
     # print("Accuracy=%f, Standard deviation=%f" % virginica.evaluate())
 
-    # tp = Perceptron(Toy(), 0.1, 100)
-    # print("Accuracy=%f, Standard deviation=%f" % tp.evaluate())
+    tp = Perceptron(Toy(), 0.1, 100)
+    print("Accuracy=%f, Standard deviation=%f" % tp.evaluate())
     plt.show()
-  
-    
+
 if __name__ == "__main__":
     main()
