@@ -5,16 +5,32 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import matplotlib.pyplot as plt
 from toy_problem import Toy
+import math
 
 class SingleLayerPerceptron():
  
-    def __init__(self, learn_rate=0.1, neurons=3, max_epochs=200, problem=None):
+    def __init__(self, learn_rate=0.1, neurons=3, max_epochs=200, problem=None, activation='step'):
         self.learn_rate = learn_rate
         self.max_epochs = max_epochs
         self.neurons = neurons
         self.problem = problem
         self.realizations = []
-        self.activation_function = np.vectorize(lambda x: 1 if x >= 0 else 0)
+        self.activation = activation
+        if self.activation == 'step':
+            self.activation_function = np.vectorize(lambda x: self.step(x))
+        elif self.activation == 'logistic':
+            self.activation_function = np.vectorize(lambda x: self.logistic(x))
+        elif self.activation == 'hiperbolic':
+            self.activation_function = np.vectorize(lambda x: self.hiperbolic(x))
+        
+    def logistic(self, x):
+        return 1 / (1 + math.exp(-x))
+
+    def hiperbolic(self, x):
+        return math.tanh(x)
+
+    def step(self, x):
+        return 1.0 if x >= 0.0 else 0.0    
 
     def train_weights(self, train_df, learn_rate, max_epochs):
         train_data = train_df.drop(['d0','d1','d2'], axis=1).values
@@ -25,7 +41,7 @@ class SingleLayerPerceptron():
         while(epoch < max_epochs):
             shuffle(train_data, target)
             for row, row_target in zip(train_data, target):  
-                prediction = self.predict(row, weights.T)
+                prediction = self.predict(row, weights.T) if self.activation == 'step' else self.activation_function(np.dot(row, weights.T)) 
                 error = row_target - prediction
                 weights = weights + learn_rate * np.outer(row, error).T
             epoch += 1
@@ -47,7 +63,7 @@ class SingleLayerPerceptron():
         return train, test, weights, self.hit_rate(test, weights)
     
     def evaluate(self):
-        for _ in range(10):
+        for _ in range(2):
             self.realizations.append(self.realize())
         hit_rates = np.array(self.realizations)[:,3].astype(float)    
         acc = np.average(hit_rates)
@@ -59,7 +75,7 @@ class SingleLayerPerceptron():
     def predict(self, row, weights):
         return self.validate(np.dot(row, weights))
 
-    def validate(self, prediction):      
+    def validate(self, prediction):        
         if sum(self.activation_function(prediction)) != 1:
             return [1 if output == np.amax(prediction) else 0 for output in prediction]
         else:
@@ -73,7 +89,7 @@ class SingleLayerPerceptron():
         x1_max, x1_min = data[c[1]].max() + 0.2, data[c[1]].min() - 0.2
         x2_max, x2_min = data[c[2]].max() + 0.2, data[c[2]].min() - 0.2
 
-        xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.05), np.arange(x2_min, x2_max, 0.05))
+        xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.09), np.arange(x2_min, x2_max, 0.09))
         Z =  np.array([xx1.ravel(), xx2.ravel()]).T
         
         fig, ax = plt.subplots()
@@ -99,5 +115,5 @@ class SingleLayerPerceptron():
 # problem = Iris(drop=['x1', 'x2'])
 problem = Toy(neurons=3, class_size=50)
 
-slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=500)
+slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='step')
 slp.evaluate()
