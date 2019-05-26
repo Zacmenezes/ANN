@@ -27,7 +27,7 @@ class SingleLayerPerceptron():
         return 1 / (1 + math.exp(-x))
 
     def hiperbolic(self, x):
-        return math.tanh(x)
+        return (math.tanh(x) + 1)/2
 
     def step(self, x):
         return 1.0 if x >= 0.0 else 0.0    
@@ -41,7 +41,7 @@ class SingleLayerPerceptron():
         while(epoch < max_epochs):
             shuffle(train_data, target)
             for row, row_target in zip(train_data, target):  
-                prediction = self.predict(row, weights.T) if self.activation == 'step' else self.activation_function(np.dot(row, weights.T)) 
+                prediction = self.predict(row, weights.T) if self.activation == 'step' else self.activation_function(np.dot(row, weights.T))
                 error = row_target - prediction
                 weights = weights + learn_rate * np.outer(row, error).T
             epoch += 1
@@ -63,20 +63,20 @@ class SingleLayerPerceptron():
         return train, test, weights, self.hit_rate(test, weights)
     
     def evaluate(self):
-        for _ in range(2):
+        for _ in range(20):
             self.realizations.append(self.realize())
         hit_rates = np.array(self.realizations)[:,3].astype(float)    
         acc = np.average(hit_rates)
-        std = np.std(hit_rates)
+        std = np.std(hit_rates, dtype=np.float32)
         index = (np.abs(hit_rates)).argmax()
-        print("Accuracy=%f, Standard deviation=%f" % (acc, std))
-        self.plot_decision_surface(self.realizations[index][1], self.realizations[index][2])
+        print("Activation=%s Accuracy=%f, Standard deviation=%f" % (self.activation, acc, std))
+        # self.plot_decision_surface(self.realizations[index][1], self.realizations[index][2])
 
     def predict(self, row, weights):
         return self.validate(np.dot(row, weights))
 
-    def validate(self, prediction):        
-        if sum(self.activation_function(prediction)) != 1:
+    def validate(self, prediction):
+        if sum(prediction) != 1:   
             return [1 if output == np.amax(prediction) else 0 for output in prediction]
         else:
             return self.activation_function(prediction)
@@ -113,7 +113,10 @@ class SingleLayerPerceptron():
 
 
 # problem = Iris(drop=['x1', 'x2'])
-problem = Toy(neurons=3, class_size=50)
+problem = Iris()
+# problem = Toy(neurons=3, class_size=50)
 
-slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='step')
+# slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='step')
+# slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='logistic')
+slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='hiperbolic')
 slp.evaluate()
