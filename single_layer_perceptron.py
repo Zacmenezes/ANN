@@ -13,6 +13,7 @@ class SingleLayerPerceptron():
         self.max_epochs = max_epochs
         self.neurons = neurons
         self.problem = problem
+        self.realizations = []
         self.activation_function = np.vectorize(lambda x: 1 if x >= 0 else 0)
 
     def train_weights(self, train_df, learn_rate, max_epochs):
@@ -40,12 +41,21 @@ class SingleLayerPerceptron():
                 hit += 1
         return (hit/ float(len(actual))) * 100.0
 
-    def test(self):
+    def realize(self):
         train, test = train_test_split(self.problem.data, test_size=0.2)
         weights = self.train_weights(train, self.learn_rate, self.max_epochs)
-        print(self.hit_rate(test, weights))
-        self.plot_decision_surface(test, weights)
+        return train, test, weights, self.hit_rate(test, weights)
     
+    def evaluate(self):
+        for _ in range(10):
+            self.realizations.append(self.realize())
+        hit_rates = np.array(self.realizations)[:,3].astype(float)    
+        acc = np.average(hit_rates)
+        std = np.std(hit_rates)
+        index = (np.abs(hit_rates)).argmax()
+        print("Accuracy=%f, Standard deviation=%f" % (acc, std))
+        self.plot_decision_surface(self.realizations[index][1], self.realizations[index][2])
+
     def predict(self, row, weights):
         return self.validate(np.dot(row, weights))
 
@@ -63,7 +73,7 @@ class SingleLayerPerceptron():
         x1_max, x1_min = data[c[1]].max() + 0.2, data[c[1]].min() - 0.2
         x2_max, x2_min = data[c[2]].max() + 0.2, data[c[2]].min() - 0.2
 
-        xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.09), np.arange(x2_min, x2_max, 0.09))
+        xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.05), np.arange(x2_min, x2_max, 0.05))
         Z =  np.array([xx1.ravel(), xx2.ravel()]).T
         
         fig, ax = plt.subplots()
@@ -86,8 +96,8 @@ class SingleLayerPerceptron():
         plt.show()
 
 
-problem = Iris(drop=['x1', 'x2'])
+# problem = Iris(drop=['x1', 'x2'])
 problem = Toy(neurons=3, class_size=50)
 
 slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=500)
-slp.test()
+slp.evaluate()

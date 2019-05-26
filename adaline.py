@@ -65,6 +65,6 @@ class Adaline:
             ax.set_zlabel('z', fontsize=20)
         plt.show()
 
-toy = Toy2(5, -3)
+toy = Toy2(5, -3, 3)
 a = Adaline(toy, 0.01, 500)
 a.evaluate(5)
