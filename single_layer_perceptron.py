@@ -73,7 +73,7 @@ class SingleLayerPerceptron():
         std = np.std(hit_rates, dtype=np.float32)
         index = (np.abs(hit_rates)).argmax()
         print("Activation=%s Accuracy=%f, Standard deviation=%f" % (self.activation, acc, std))
-        # self.plot_decision_surface(self.realizations[index][1], self.realizations[index][2])
+        self.plot_decision_surface(self.realizations[index][1], self.realizations[index][2])
 
     def predict(self, row, weights):
         return self.validate(np.dot(row, weights))
@@ -117,10 +117,10 @@ class SingleLayerPerceptron():
 
 # problem = Iris(drop=['x1', 'x2'])
 # problem = Iris(inhibit=-1)
-problem = Iris()
-# problem = Toy(neurons=3, class_size=50)
+# problem = Iris()
+problem = Toy(neurons=3, class_size=50)
 
-slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='step')
+slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=500, activation='step')
 # slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='logistic')
 # slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='hiperbolic')
 slp.evaluate()

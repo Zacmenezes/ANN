@@ -8,8 +8,9 @@ class Toy(AbstractProblem):
     
     deviationFromPoint = 0.5
 
-    def __init__(self, neurons=1, class_size=10):
+    def __init__(self, neurons=1, class_size=10, inhibit=0):
         self.neurons = neurons
+        self.inhibit = inhibit
         self.class_size = class_size
         self.data = self.prepare_dataset("data/toy.data")
 
@@ -22,7 +23,7 @@ class Toy(AbstractProblem):
         return data
 
     def generate_data(self):
-        data = self.create_points([1,1], 'a')
+        data = self.create_points([0.5,0.5], 'a')
         data = data.append(self.create_points([1,0], 'b'),  ignore_index=True)
         data = data.append(self.create_points([0,0], 'c'),  ignore_index=True)
         if self.neurons == 1:
@@ -39,9 +40,9 @@ class Toy(AbstractProblem):
 
     def map_class(self, df):
         if(self.neurons == 3):
-            df['d0'] = np.where(df['d'] == 'a', 1, 0)
-            df['d1'] = np.where(df['d'] == 'b', 1, 0)
-            df['d2'] = np.where(df['d'] == 'c', 1, 0)
+            df['d0'] = np.where(df['d'] == 'a', 1, self.inhibit)
+            df['d1'] = np.where(df['d'] == 'b', 1, self.inhibit)
+            df['d2'] = np.where(df['d'] == 'c', 1, self.inhibit)
             df = df.drop(['d'], axis=1)
         else:
             df['d'] = np.where(df['d'] == 'a', 0, 1)
