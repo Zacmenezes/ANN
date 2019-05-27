@@ -4,8 +4,9 @@ import pandas as pd
 
 class Iris(AbstractProblem):
 
-    def __init__(self, label=None, drop=[]):
+    def __init__(self, label=None, drop=[], inhibit=0):
         self.label = label
+        self.inhibit = inhibit
         self.data = self.prepare_dataset('data/iris.data')
         if(len(drop) == 2):
             self.data = self.data.drop(drop, axis=1)    
@@ -19,9 +20,9 @@ class Iris(AbstractProblem):
     
     def map_class(self, df):
         if(self.label == None):
-            df['d0'] = np.where(df['d'] == 'Iris-setosa', 1, 0)
-            df['d1'] = np.where(df['d'] == 'Iris-versicolor', 1, 0)
-            df['d2'] = np.where(df['d'] == 'Iris-virginica', 1, 0)
+            df['d0'] = np.where(df['d'] == 'Iris-setosa', 1, self.inhibit)
+            df['d1'] = np.where(df['d'] == 'Iris-versicolor', 1, self.inhibit)
+            df['d2'] = np.where(df['d'] == 'Iris-virginica', 1, self.inhibit)
             df = df.drop(['d'], axis=1)
         else:
             df['d'] = np.where(df['d'] == self.label, 0, 1)

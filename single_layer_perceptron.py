@@ -18,16 +18,19 @@ class SingleLayerPerceptron():
         self.activation = activation
         if self.activation == 'step':
             self.activation_function = np.vectorize(lambda x: self.step(x))
+            self.derivate = np.vectorize(lambda x: 1)    
         elif self.activation == 'logistic':
             self.activation_function = np.vectorize(lambda x: self.logistic(x))
+            self.derivate = np.vectorize(lambda x: self.logistic(x) * (1 - self.logistic(x)))    
         elif self.activation == 'hiperbolic':
             self.activation_function = np.vectorize(lambda x: self.hiperbolic(x))
-        
+            self.derivate = np.vectorize(lambda x: 0.5 * (1 - self.hiperbolic(x) * self.hiperbolic(x)) )    
+
     def logistic(self, x):
         return 1 / (1 + math.exp(-x))
 
     def hiperbolic(self, x):
-        return (math.tanh(x) + 1)/2
+        return math.tanh(x)
 
     def step(self, x):
         return 1.0 if x >= 0.0 else 0.0    
@@ -43,7 +46,7 @@ class SingleLayerPerceptron():
             for row, row_target in zip(train_data, target):  
                 prediction = self.predict(row, weights.T) if self.activation == 'step' else self.activation_function(np.dot(row, weights.T))
                 error = row_target - prediction
-                weights = weights + learn_rate * np.outer(row, error).T
+                weights = weights + learn_rate * (np.outer(row, error) * self.derivate(prediction)).T
             epoch += 1
         return weights
 
@@ -77,7 +80,7 @@ class SingleLayerPerceptron():
 
     def validate(self, prediction):
         if sum(prediction) != 1:   
-            return [1 if output == np.amax(prediction) else 0 for output in prediction]
+            return [1 if output == np.amax(prediction) else self.problem.inhibit for output in prediction]
         else:
             return self.activation_function(prediction)
 
@@ -113,10 +116,11 @@ class SingleLayerPerceptron():
 
 
 # problem = Iris(drop=['x1', 'x2'])
+# problem = Iris(inhibit=-1)
 problem = Iris()
 # problem = Toy(neurons=3, class_size=50)
 
-# slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='step')
+slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='step')
 # slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='logistic')
-slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='hiperbolic')
+# slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='hiperbolic')
 slp.evaluate()
