@@ -48,6 +48,7 @@ class Adaline:
         ms_errors = [r[0] for r in results]
         rms_errors = [r[1] for r in results]
         index = (np.abs(ms_errors)).argmin() 
+        print("MSE Standard deviation: %f RMSE Standard deviation: %f" % (np.std(ms_errors), np.std(rms_errors)))
         print("Melhor resultado: MSE=%f RMSE=%f" % (results[index][0], results[index][1]))     
         self.plot(results[index][2], results[index][3])
 
@@ -65,6 +66,6 @@ class Adaline:
             ax.set_zlabel('z', fontsize=20)
         plt.show()
 
-toy = Toy2(5, -3, 3)
+toy = Toy2(5, -3, 12)
 a = Adaline(toy, 0.01, 500)
-a.evaluate(5)
+a.evaluate(20)
