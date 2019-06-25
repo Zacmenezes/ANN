@@ -43,7 +43,7 @@ class SingleLayerPerceptron():
         for _ in range(max_epochs):
             shuffle(train_data, target)
             for row, row_target in zip(train_data, target):  
-                prediction = self.activation_function(np.dot(row, weights.T))
+                prediction = self.predict(row, weights.T)
                 error = row_target - prediction
                 weights = weights + learn_rate * (np.outer(row, error) * self.derivate(prediction)).T        
         return weights
@@ -74,8 +74,11 @@ class SingleLayerPerceptron():
         # self.plot_decision_surface(self.realizations[index][1], self.realizations[index][2])
 
     def predict(self, row, weights):
-        prediction = self.activation_function(np.dot(row, weights))
-        return [1 if output == np.amax(prediction) else self.problem.inhibit for output in prediction]
+        u = np.dot(row, weights)
+        prediction = self.activation_function(u)
+        aux = u if self.activation == 'step' else prediction
+        return prediction if sum(prediction) == 1 else [1 if output == np.amax(aux) else self.problem.inhibit for output in aux]
+
 
     def plot_decision_surface(self, data, weights):
         c = data.columns
@@ -109,7 +112,7 @@ class SingleLayerPerceptron():
 
 #no plot
 # problem = Iris()
-problem = Iris(inhibit=-1)
+# problem = Iris(inhibit=-1)
 
 #plot
 # problem = Iris(drop=['x1', 'x2'])
@@ -119,7 +122,9 @@ problem = Iris(inhibit=-1)
 # problem = Toy(neurons=3, class_size=50, inhibit=-1)
 # problem = Toy(neurons=3, class_size=50)
 
-# slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=600, activation='step')
-# slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, neurons=1, max_epochs=600, activation='logistic')
-slp  = SingleLayerPerceptron(problem=problem, learn_rate=0.01, max_epochs=1000, activation='hiperbolic')
-slp.evaluate(n=5)
+slp  = SingleLayerPerceptron(problem=Iris(), learn_rate=0.01, max_epochs=1000, activation='step')
+slp.evaluate(n=20)
+slp  = SingleLayerPerceptron(problem=Iris(), learn_rate=0.01, neurons=1, max_epochs=1000, activation='logistic')
+slp.evaluate(n=20)
+slp  = SingleLayerPerceptron(problem=Iris(inhibit=-1), learn_rate=0.01, max_epochs=1000, activation='hiperbolic')
+slp.evaluate(n=20)
