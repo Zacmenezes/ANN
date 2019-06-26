@@ -14,6 +14,7 @@ class Iris(AbstractProblem):
     def prepare_dataset(self, path):
         df = pd.read_csv(path, header=None)
         df.columns = ['x1', 'x2', 'x3', 'x4', 'd']
+        df[['x1', 'x2', 'x3', 'x4']] = df[['x1', 'x2', 'x3', 'x4']].apply(self.normalize)
         df = self.map_class(df)    
         df = self.create_x0(df).join(df)
         return df
@@ -27,3 +28,6 @@ class Iris(AbstractProblem):
         else:
             df['d'] = np.where(df['d'] == self.label, 0, 1)
         return df
+
+    def normalize(self, df):
+        return (df-df.min())/(df.max()-df.min())

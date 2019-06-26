@@ -71,7 +71,7 @@ class SingleLayerPerceptron():
         std = np.std(hit_rates, dtype=np.float32)
         index = (np.abs(hit_rates)).argmax()
         print("Activation=%s Accuracy=%f, Standard deviation=%f" % (self.activation, acc, std))
-        # self.plot_decision_surface(self.realizations[index][1], self.realizations[index][2])
+        self.plot_decision_surface(self.realizations[index][1], self.realizations[index][2])
 
     def predict(self, row, weights):
         u = np.dot(row, weights)
@@ -88,17 +88,18 @@ class SingleLayerPerceptron():
         x1_max, x1_min = data[c[1]].max() + 0.2, data[c[1]].min() - 0.2
         x2_max, x2_min = data[c[2]].max() + 0.2, data[c[2]].min() - 0.2
 
-        xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.09), np.arange(x2_min, x2_max, 0.09))
+        xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.04), np.arange(x2_min, x2_max, 0.04))
         Z =  np.array([xx1.ravel(), xx2.ravel()]).T
         
         fig, ax = plt.subplots()
         ax.set_facecolor((0.97, 0.97, 0.97))
         for x1, x2 in Z:
-            if (self.predict([1, x1, x2], weights.T) == np.array([1, self.problem.inhibit, self.problem.inhibit])).all(): 
+            prediction = self.predict([1, x1, x2], weights.T)
+            if (prediction == np.array([1, self.problem.inhibit, self.problem.inhibit])).all(): 
                 ax.scatter(x1, x2, c='red', s=1.5, marker='o')
-            elif (self.predict([1, x1, x2], weights.T) == np.array([self.problem.inhibit, 1, self.problem.inhibit])).all():
+            elif (prediction == np.array([self.problem.inhibit, 1, self.problem.inhibit])).all():
                 ax.scatter(x1, x2, c='green', s=1.5, marker='o')
-            elif (self.predict([1, x1, x2], weights.T) == np.array([self.problem.inhibit, self.problem.inhibit, 1])).all(): 
+            elif (prediction == np.array([self.problem.inhibit, self.problem.inhibit, 1])).all(): 
                 ax.scatter(x1, x2, c='blue', s=1.5, marker='o')
 
         for row, row_target in zip(test, actual):
@@ -110,21 +111,16 @@ class SingleLayerPerceptron():
                 ax.scatter(row[1], row[2], c='blue', marker='o')       
         plt.show()
 
-#no plot
-# problem = Iris()
-# problem = Iris(inhibit=-1)
 
-#plot
-# problem = Iris(drop=['x1', 'x2'])
 
-#plot hiperbolic
-# problem = Iris(drop=['x1', 'x2'], inhibit=-1)
-# problem = Toy(neurons=3, class_size=50, inhibit=-1)
-# problem = Toy(neurons=3, class_size=50)
+slp  = SingleLayerPerceptron(problem=Iris(drop=['x1', 'x2']), learn_rate=0.01, max_epochs=500, activation='step')
+# slp  = SingleLayerPerceptron(problem=Toy(neurons=3, class_size=50), learn_rate=0.01, max_epochs=500, activation='step')
 
-slp  = SingleLayerPerceptron(problem=Iris(), learn_rate=0.01, max_epochs=1000, activation='step')
-slp.evaluate(n=20)
-slp  = SingleLayerPerceptron(problem=Iris(), learn_rate=0.01, neurons=1, max_epochs=1000, activation='logistic')
-slp.evaluate(n=20)
-slp  = SingleLayerPerceptron(problem=Iris(inhibit=-1), learn_rate=0.01, max_epochs=1000, activation='hiperbolic')
-slp.evaluate(n=20)
+# slp  = SingleLayerPerceptron(problem=Iris(drop=['x1', 'x2']), learn_rate=0.01, max_epochs=1000, activation='logistic')
+# slp  = SingleLayerPerceptron(problem=Toy(neurons=3, class_size=50), learn_rate=0.01, max_epochs=500, activation='logistic')
+
+# slp  = SingleLayerPerceptron(problem=Iris(drop=['x1', 'x2'], inhibit=-1), learn_rate=0.01, max_epochs=1000, activation='hiperbolic')
+# slp  = SingleLayerPerceptron(problem=Toy(neurons=3, class_size=50, inhibit=-1), learn_rate=0.01, max_epochs=500, activation='hiperbolic')
+
+
+slp.evaluate(n=5)
