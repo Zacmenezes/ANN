@@ -45,7 +45,7 @@ class SingleLayerPerceptron():
             for row, row_target in zip(train_data, target):  
                 prediction = self.predict(row, weights.T)
                 error = row_target - prediction
-                weights = weights + learn_rate * (np.outer(row, error) * self.derivate(prediction)).T        
+                weights = weights + learn_rate * np.outer(row, error * self.derivate(prediction)).T        
         return weights
 
     def hit_rate(self, data, trained_weights):
@@ -71,7 +71,7 @@ class SingleLayerPerceptron():
         std = np.std(hit_rates, dtype=np.float32)
         index = (np.abs(hit_rates)).argmax()
         print("Activation=%s Accuracy=%f, Standard deviation=%f" % (self.activation, acc, std))
-        self.plot_decision_surface(self.realizations[index][1], self.realizations[index][2])
+        # self.plot_decision_surface(self.realizations[index][1], self.realizations[index][2])
 
     def predict(self, row, weights):
         u = np.dot(row, weights)
@@ -113,14 +113,14 @@ class SingleLayerPerceptron():
 
 
 
-slp  = SingleLayerPerceptron(problem=Iris(drop=['x1', 'x2']), learn_rate=0.01, max_epochs=500, activation='step')
+# slp  = SingleLayerPerceptron(problem=Iris(drop=['x1', 'x2']), learn_rate=0.01, max_epochs=500, activation='step')
 # slp  = SingleLayerPerceptron(problem=Toy(neurons=3, class_size=50), learn_rate=0.01, max_epochs=500, activation='step')
 
 # slp  = SingleLayerPerceptron(problem=Iris(drop=['x1', 'x2']), learn_rate=0.01, max_epochs=1000, activation='logistic')
 # slp  = SingleLayerPerceptron(problem=Toy(neurons=3, class_size=50), learn_rate=0.01, max_epochs=500, activation='logistic')
 
 # slp  = SingleLayerPerceptron(problem=Iris(drop=['x1', 'x2'], inhibit=-1), learn_rate=0.01, max_epochs=1000, activation='hiperbolic')
-# slp  = SingleLayerPerceptron(problem=Toy(neurons=3, class_size=50, inhibit=-1), learn_rate=0.01, max_epochs=500, activation='hiperbolic')
+slp  = SingleLayerPerceptron(problem=Toy(neurons=3, class_size=50, inhibit=-1), learn_rate=0.05, max_epochs=600, activation='hiperbolic')
 
 
 slp.evaluate(n=5)
