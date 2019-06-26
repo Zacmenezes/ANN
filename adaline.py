@@ -39,7 +39,7 @@ class Adaline:
             error = row[-1] - prediction
             errors.append(error * error)
         print("MSE=%f RMSE=%f" % (np.mean(errors), np.sqrt(np.mean(errors))))
-        return np.mean(errors), np.sqrt(np.mean(errors)), test, predictions
+        return np.mean(errors), np.sqrt(np.mean(errors)), test, predictions, weights
 
     def evaluate(self, n):
         results = []
@@ -50,22 +50,32 @@ class Adaline:
         index = (np.abs(ms_errors)).argmin() 
         print("MSE Standard deviation: %f RMSE Standard deviation: %f" % (np.std(ms_errors), np.std(rms_errors)))
         print("Melhor resultado: MSE=%f RMSE=%f" % (results[index][0], results[index][1]))     
-        self.plot(results[index][2], results[index][3])
+        self.plot(results[index][2], results[index][4])
 
-    def plot(self, data, predictions):
+    def plot(self, data, weights):
+       
+        predictions = []
+
         if(self.problem.c == None):
+            space = np.linspace(0, 1, 1000)
+            for x in space:
+                predictions.append(self.predict([1, x], weights))
             plt.scatter(data['x'].values, data['y'].values, c='blue', s=5)
-            plt.scatter(data['x'].values, predictions, c='red', s=10)
+            plt.scatter(space, predictions, c='red', s=5)
         else:
+            space = np.meshgrid(np.linspace(0, 1, 10), np.linspace(0, 1, 10))
+            Z =  np.array([space[0].ravel(), space[1].ravel()]).T
+            for x, y in Z:
+                predictions.append(self.predict([1, x, y], weights))
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
-            ax.plot_trisurf(data['x'].values, data['y'].values, predictions, linewidth=0.2, antialiased=True)
+            ax.plot_trisurf(space[0].ravel(), space[1].ravel(), predictions, linewidth=0.2, antialiased=True)
             ax.scatter(data['x'].values, data['y'].values, data['z'].values, c='red', marker='*')
             ax.set_xlabel('x', fontsize=20)
             ax.set_ylabel('y', fontsize=20)
             ax.set_zlabel('z', fontsize=20)
         plt.show()
 
-toy = Toy2(5, -3)
+toy = Toy2(5, -3, 20)
 a = Adaline(toy, 0.01, 500)
-a.evaluate(20)
+a.evaluate(2)
