@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from iris_problem import Iris
 from vertebral_problem import Vertebral
+from dermatology_problem import Dermatology
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import matplotlib.pyplot as plt
@@ -11,13 +12,11 @@ import math
 
 class MLP():
     def __init__(self,
-                 n_output=3,
                  n_hidden=[8],
                  eta_initial=0.5,
                  eta_final=0.1,
                  max_epochs=200,
                  problem=None):
-        self.n_output = n_output
         self.n_hidden = n_hidden
         self.eta_initial = eta_initial
         self.eta_final = eta_final
@@ -30,8 +29,7 @@ class MLP():
 
     def initLayers(self):
         layers = []
-        input_size = self.problem.data.drop(['d0', 'd1', 'd2'],
-                                            axis=1).values.shape[1]
+        input_size = len(self.problem.data_labels)
 
         # Hidden layers
         for layer_index in range(len(self.n_hidden)):
@@ -51,7 +49,7 @@ class MLP():
         M = np.random.uniform(low=-1.0,
                               high=1.0,
                               size=(self.n_hidden[len(self.n_hidden) - 1],
-                                    self.n_output))
+                                    len(self.problem.target_labels)))
         layers.append({
             'weights': M,
             'h': None,
@@ -96,8 +94,8 @@ class MLP():
         return 1 / (1 + np.exp(-x))
 
     def train(self, layers, train_df):
-        train_data = train_df.drop(['d0', 'd1', 'd2'], axis=1).values
-        target = train_df[['d0', 'd1', 'd2']].values
+        train_data = train_df[self.problem.data_labels].values
+        target = train_df[self.problem.target_labels].values
 
         for epoch in range(self.max_epochs):
             shuffle(train_data, target)
@@ -109,8 +107,8 @@ class MLP():
         return layers
 
     def hit_rate(self, layers, data):
-        actual = data[['d0', 'd1', 'd2']].values
-        test = data.drop(['d0', 'd1', 'd2'], axis=1).values
+        actual = data[self.problem.target_labels].values
+        test = data[self.problem.data_labels].values
         hit = 0
         for row, row_target in zip(test, actual):
             layers = self.fowardPropagate(layers, row)
@@ -145,12 +143,11 @@ class MLP():
                                    self.eta_initial)**(epoch / self.max_epochs)
 
 
-mlp = MLP(problem=Iris(), n_output=3, n_hidden=[12], max_epochs=400)
+mlp = MLP(problem=Iris(), n_hidden=[12], max_epochs=400)
 
 # mlp = MLP(problem=Vertebral(),
 #           eta_initial=0.5,
 #           eta_final=0.1,
-#           n_output=3,
 #           n_hidden=[12],
 #           max_epochs=500)
 
