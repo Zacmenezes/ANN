@@ -10,7 +10,7 @@ class AbstractProblem(ABC):
         self.prepare_dataset(dataset_path)
 
     def create_x0(self, data):
-        return pd.DataFrame({'x0': np.ones(len(data.index))})
+        return pd.DataFrame({'x0': np.ones(len(data.index)) * - 1})
 
     @abstractmethod
     def prepare_dataset(self, path):
