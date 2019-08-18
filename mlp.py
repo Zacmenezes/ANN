@@ -3,6 +3,7 @@ import pandas as pd
 from iris_problem import Iris
 from vertebral_problem import Vertebral
 from dermatology_problem import Dermatology
+from breast_problem import Breast
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import matplotlib.pyplot as plt
@@ -143,7 +144,7 @@ class MLP():
                                    self.eta_initial)**(epoch / self.max_epochs)
 
 
-mlp = MLP(problem=Vertebral(), n_hidden=[12], max_epochs=400)
+mlp = MLP(problem=Breast(), n_hidden=[4], max_epochs=500)
 
 # mlp = MLP(problem=Vertebral(),
 #           eta_initial=0.5,
