@@ -30,7 +30,6 @@ class Dermatology(AbstractProblem):
         return labels
 
     def map_class(self, df):
-    
         df['d0'] = np.where(df['d'] == 1, 1, 0)
         df['d1'] = np.where(df['d'] == 2, 1, 0)
         df['d2'] = np.where(df['d'] == 3, 1, 0)

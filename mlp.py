@@ -143,7 +143,7 @@ class MLP():
                                    self.eta_initial)**(epoch / self.max_epochs)
 
 
-mlp = MLP(problem=Iris(), n_hidden=[12], max_epochs=400)
+mlp = MLP(problem=Vertebral(), n_hidden=[12], max_epochs=400)
 
 # mlp = MLP(problem=Vertebral(),
 #           eta_initial=0.5,
