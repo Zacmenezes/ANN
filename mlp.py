@@ -120,6 +120,7 @@ class MLP():
 
     def realize(self):
         train, test = train_test_split(self.problem.data, test_size=0.2)
+        print(train)
         layers = self.initLayers()
         layers = self.train(layers, train)
         return train, test, self.hit_rate(layers, test), layers
@@ -127,7 +128,7 @@ class MLP():
     def evaluate(self, n=20):
         for _ in range(n):
             r = self.realize()
-            # self.plot_decision_surface(r[1], r[3])
+            self.plot_decision_surface(r[1], r[3])
             self.realizations.append(r)
         hit_rates = np.array(self.realizations)[:, 2].astype(float)
         acc = np.average(hit_rates)
@@ -151,7 +152,6 @@ class MLP():
         c = data.columns 
         actual = data[['d']].values
         test = data.drop(['d'], axis=1).values
-        print(c)
 
         x1_max, x1_min = data[c[1]].max() + 0.2, data[c[1]].min() - 0.2
         x2_max, x2_min = data[c[2]].max() + 0.2, data[c[2]].min() - 0.2
@@ -162,7 +162,7 @@ class MLP():
         fig, ax = plt.subplots()
         ax.set_facecolor((0.97, 0.97, 0.97))
         for x1, x2 in Z:
-            l = self.fowardPropagate(layers, [1, x1, x2])
+            l = self.fowardPropagate(layers, [-1, x1, x2])
             prediction = self.validate(l[len(layers) - 1]['output'])
             if (prediction == np.array([1])).all(): 
                 ax.scatter(x1, x2, c='red', s=1.5, marker='o')
@@ -178,8 +178,8 @@ class MLP():
         plt.show()
 
 
-mlp = MLP(problem=XOR(), n_hidden=[2],  eta_initial=0.5,
-                 eta_final=0.1, max_epochs=400)
+mlp = MLP(problem=XOR(), n_hidden=[2],  eta_initial=0.05,
+                 eta_final=0.01, max_epochs=800)
 
 
 mlp.evaluate(n=1)

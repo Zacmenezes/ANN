@@ -21,10 +21,9 @@ class XOR(AbstractProblem):
         df.columns = cols
         self.data_labels = df.columns[:2].tolist()
         self.target_labels = df.columns[2:].tolist()
-        # df[self.data_labels] = df[self.data_labels].apply(self.normalize)
+        df[self.data_labels] = df[self.data_labels].apply(self.normalize)
         df = self.create_x0(df).join(df)
         self.data_labels = ['x0'] + self.data_labels
-        print(self.data_labels, self.target_labels)
 
         return df
 
