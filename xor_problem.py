@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 class XOR(AbstractProblem):
     
-    deviationFromPoint = 0.1
+    deviationFromPoint = 0.4
 
     def __init__(self, class_size=50):
         self.class_size = class_size

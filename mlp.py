@@ -30,7 +30,7 @@ class MLP():
     def initLayers(self):
         layers = []
         input_size = len(self.problem.data_labels)
-
+        np.random.seed()
         # Hidden layers
         for layer_index in range(len(self.n_hidden)):
             W = np.random.uniform(low=-10,
@@ -127,11 +127,12 @@ class MLP():
         for _ in range(n):
             r = self.realize()
             self.realizations.append(r)
-            # self.plot_decision_surface(r[1], r[3])
+            print(r[2])
         hit_rates = np.array(self.realizations)[:, 2].astype(float)
         acc = np.average(hit_rates)
         std = np.std(hit_rates, dtype=np.float32)
         index = (np.abs(hit_rates)).argmax()
+        # self.plot_decision_surface(self.realizations[index][1], self.realizations[index][3])
         print("Accuracy=%f, Standard deviation=%f" % (acc, std))
 
     def validate(self, prediction):
@@ -173,8 +174,8 @@ class MLP():
         plt.show()
 
 
-mlp = MLP(problem=XOR(), n_hidden=[8],  eta_initial=0.5,
-                 eta_final=0.3, max_epochs=600)
+mlp = MLP(problem=Breast(), n_hidden=[12],  eta_initial=0.3,
+                 eta_final=0.1, max_epochs=800)
 
 
-mlp.evaluate(n=10)
+mlp.evaluate(n=5)
