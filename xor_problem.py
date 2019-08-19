@@ -19,12 +19,12 @@ class XOR(AbstractProblem):
         df = self.generate_data()
         cols = self.get_column_labels(df) + ['d']
         df.columns = cols
+        df = self.map_class(df)
         self.data_labels = df.columns[:2].tolist()
         self.target_labels = df.columns[2:].tolist()
         df[self.data_labels] = df[self.data_labels].apply(self.normalize)
         df = self.create_x0(df).join(df)
         self.data_labels = ['x0'] + self.data_labels
-
         return df
 
     def get_column_labels(self, df):
@@ -47,17 +47,22 @@ class XOR(AbstractProblem):
             points.append(coords)          
         return pd.DataFrame(data=points, columns=['x1', 'x2', 'd'])
 
+    def map_class(self, df):    
+        df['d0'] = np.where(df['d'] == 1, 1, 0)
+        df['d1'] = np.where(df['d'] == 0, 1, 0)
+        df = df.drop(['d'], axis=1)
+        return df
 
     def plot_data(self):
-        target = self.data[['d']].values
-        data = self.data.drop(['d'], axis=1).values
+        target = self.data[['d0', 'd1']].values
+        data = self.data.drop(['d0', 'd1'], axis=1).values
 
         fig, ax = plt.subplots()
         ax.set_facecolor((0.97, 0.97, 0.97))
         for row, row_target in zip(data, target):
-            if (row_target == np.array([1])).all():
+            if (row_target == np.array([1, 0])).all():
                 ax.scatter(row[1], row[2], c='red', marker='o')
-            elif (row_target == np.array([0])).all():
+            elif (row_target == np.array([0, 1])).all():
                 ax.scatter(row[1], row[2], c='blue', marker='*')   
 
         plt.show()

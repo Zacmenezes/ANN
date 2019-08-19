@@ -8,7 +8,6 @@ from xor_problem import XOR
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import matplotlib.pyplot as plt
-import math
 
 
 class MLP():
@@ -34,8 +33,8 @@ class MLP():
 
         # Hidden layers
         for layer_index in range(len(self.n_hidden)):
-            W = np.random.uniform(low=-1.0,
-                                  high=1.0,
+            W = np.random.uniform(low=-10,
+                                  high=10,
                                   size=(input_size,
                                         self.n_hidden[layer_index]))
             layers.append({
@@ -47,8 +46,8 @@ class MLP():
             input_size = W.shape[1]
 
         # Output layer
-        M = np.random.uniform(low=-1.0,
-                              high=1.0,
+        M = np.random.uniform(low=-10,
+                              high=10,
                               size=(self.n_hidden[len(self.n_hidden) - 1],
                                     len(self.problem.target_labels)))
         layers.append({
@@ -97,7 +96,7 @@ class MLP():
     def train(self, layers, train_df):
         train_data = train_df[self.problem.data_labels].values
         target = train_df[self.problem.target_labels].values
-
+ 
         for epoch in range(self.max_epochs):
             shuffle(train_data, target)
             for row, row_target in zip(train_data, target):
@@ -120,7 +119,6 @@ class MLP():
 
     def realize(self):
         train, test = train_test_split(self.problem.data, test_size=0.2)
-        print(train)
         layers = self.initLayers()
         layers = self.train(layers, train)
         return train, test, self.hit_rate(layers, test), layers
@@ -128,8 +126,8 @@ class MLP():
     def evaluate(self, n=20):
         for _ in range(n):
             r = self.realize()
-            self.plot_decision_surface(r[1], r[3])
             self.realizations.append(r)
+            # self.plot_decision_surface(r[1], r[3])
         hit_rates = np.array(self.realizations)[:, 2].astype(float)
         acc = np.average(hit_rates)
         std = np.std(hit_rates, dtype=np.float32)
@@ -137,12 +135,9 @@ class MLP():
         print("Accuracy=%f, Standard deviation=%f" % (acc, std))
 
     def validate(self, prediction):
-        if len(prediction) == 1:
-            return int(round(prediction[0]))
-        else:
-            return [
-                1 if output == np.amax(prediction) else 0 for output in prediction
-            ]
+        return [
+            1 if output == np.amax(prediction) else 0 for output in prediction
+        ]
 
     def eta(self, epoch):
         return self.eta_initial * (self.eta_final /
@@ -150,8 +145,8 @@ class MLP():
 
     def plot_decision_surface(self, data, layers):
         c = data.columns 
-        actual = data[['d']].values
-        test = data.drop(['d'], axis=1).values
+        actual = data[['d0', 'd1']].values
+        test = data.drop(['d0', 'd1'], axis=1).values
 
         x1_max, x1_min = data[c[1]].max() + 0.2, data[c[1]].min() - 0.2
         x2_max, x2_min = data[c[2]].max() + 0.2, data[c[2]].min() - 0.2
@@ -164,22 +159,22 @@ class MLP():
         for x1, x2 in Z:
             l = self.fowardPropagate(layers, [-1, x1, x2])
             prediction = self.validate(l[len(layers) - 1]['output'])
-            if (prediction == np.array([1])).all(): 
+            if (prediction == np.array([1, 0])).all(): 
                 ax.scatter(x1, x2, c='red', s=1.5, marker='o')
-            elif (prediction == np.array([0])).all():
+            elif (prediction == np.array([0, 1])).all():
                 ax.scatter(x1, x2, c='blue', s=1.5, marker='o')
        
         for row, row_target in zip(test, actual):
-            if (row_target == np.array([1])).all():
+            if (row_target == np.array([1, 0])).all():
                 ax.scatter(row[1], row[2], c='red', marker='o')
-            elif (row_target == np.array([0])).all():
+            elif (row_target == np.array([0, 1])).all():
                 ax.scatter(row[1], row[2], c='blue', marker='*')   
 
         plt.show()
 
 
-mlp = MLP(problem=XOR(), n_hidden=[2],  eta_initial=0.05,
-                 eta_final=0.01, max_epochs=800)
+mlp = MLP(problem=XOR(), n_hidden=[8],  eta_initial=0.5,
+                 eta_final=0.3, max_epochs=600)
 
 
-mlp.evaluate(n=1)
+mlp.evaluate(n=10)
